@@ -1,5 +1,5 @@
--- Flair: spark particles, floating judgment popups, combo confetti and a
--- screen-shake timer. Everything is white-on-black beam-and-dot work.
+-- Flair: spark particles, floating judgment popups and combo confetti.
+-- Everything is white-on-black beam-and-dot work.
 
 local gfx <const> = playdate.graphics
 
@@ -8,11 +8,9 @@ Fx = {}
 local parts = {}
 local pops = {}
 local confs = {}
-local shakeT = 0
 
 function Fx.reset()
     parts, pops, confs = {}, {}, {}
-    shakeT = 0
 end
 
 function Fx.burst(x, y, n)
@@ -41,19 +39,7 @@ function Fx.confetti(n)
     end
 end
 
-function Fx.shake(secs)
-    shakeT = math.max(shakeT, secs or 0.2)
-end
-
-function Fx.offset()
-    if shakeT > 0 then
-        return math.random(-2, 2), math.random(-2, 2)
-    end
-    return 0, 0
-end
-
 function Fx.update(dt)
-    if shakeT > 0 then shakeT = shakeT - dt end
     for i = #parts, 1, -1 do
         local p = parts[i]
         p.life = p.life - dt

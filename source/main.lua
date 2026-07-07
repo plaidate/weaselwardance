@@ -177,15 +177,12 @@ local function updatePlay(dt)
 end
 
 local function drawPlay()
-    local ox, oy = Fx.offset()
-    gfx.setDrawOffset(ox, oy)
     Prey.scenery(G.stageIdx, G.t)
     Prey.draw(G.stageIdx, G.meter, G.t)
     Dancer.draw(C.DANCER_X, C.DANCER_Y, G.stageIdx, 1)
     UI.track()
     UI.playHud()
     Fx.draw()
-    gfx.setDrawOffset(0, 0)
 end
 
 local function tick()

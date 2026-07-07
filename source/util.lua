@@ -1,14 +1,10 @@
--- Small shared helpers: clamp/lerp and the delayed-call scheduler the
+-- Small shared helpers: clamp and the delayed-call scheduler the
 -- multi-note sound effects lean on.
 
 Util = {}
 
 function Util.clamp(v, lo, hi)
     if v < lo then return lo elseif v > hi then return hi else return v end
-end
-
-function Util.lerp(a, b, t)
-    return a + (b - a) * t
 end
 
 local pending = {}

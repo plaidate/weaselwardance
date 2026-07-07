@@ -4,7 +4,16 @@ A rhythm game for Playdate about the mustelid family's greatest trick:
 stoats and weasels really do perform a frenzied "war dance" that seems
 to mesmerize their prey. Here, that dance has a beat.
 
+Full player's manual: [MANUAL.md](MANUAL.md)
+
 ![Weasel War Dance](screenshot.png)
+
+## Play it
+
+No dev tools needed: grab the prebuilt `WeaselWarDance.pdx.zip` from
+[Releases](../../releases) (or the `dist/` folder), then sideload it at
+<https://play.date/account/sideload/> — or unzip it and open the `.pdx`
+in the Playdate Simulator.
 
 Cues stream along the bottom track into the hit ring. Answer them on the
 beat and your mustelid dances; the prey's eyes spiral; the hypno meter
