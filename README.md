@@ -1,5 +1,7 @@
 # Weasel War Dance
 
+> Part of **[plAIdate](https://plaidate.github.io)** — AI-built 1-bit games, ports, and engines for the Playdate.
+
 A rhythm game for Playdate about the mustelid family's greatest trick:
 stoats and weasels really do perform a frenzied "war dance" that seems
 to mesmerize their prey. Here, that dance has a beat.
