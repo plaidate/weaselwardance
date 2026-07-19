@@ -36,12 +36,22 @@ C = {
     CLEAR_PCT = 60, -- percent needed to catch the prey / unlock the next
     RANKS = { { 95, "S" }, { 85, "A" }, { 72, "B" }, { 60, "C" }, { 0, "D" } },
 
-    -- layout
-    DANCER_X = 165,
+    -- layout. The dancer stands directly ABOVE the hit ring (same x) so the
+    -- eye reads dancer + judgment as one column instead of two focal points.
+    DANCER_X = 64,
     DANCER_Y = 186, -- feet on the ground line
     PREY_X = 330,
     PREY_Y = 186,
     GROUND_Y = 190,
+
+    -- difficulty settings (select screen, up/down). win scales the judgment
+    -- windows, meter scales the miss/flub penalties, spin is the required
+    -- crank rate, thin drops every 3rd arrow from the chart.
+    DIFFS = {
+        { name = "EASY",   win = 1.7,  meter = 0.5,  spin = 120, thin = true },
+        { name = "NORMAL", win = 1.25, meter = 0.75, spin = 150, thin = false },
+        { name = "HARD",   win = 1.0,  meter = 1.0,  spin = 180, thin = false },
+    },
 }
 
 G = {

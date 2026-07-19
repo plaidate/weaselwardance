@@ -85,7 +85,7 @@ function UI.track()
                         gfx.drawCircleAtPoint(cx, C.TRACKY, 6)
                     end
                     if active then
-                        local ratio = math.min(n.rot / (C.SPIN_RATE * n.dur), 1)
+                        local ratio = math.min(n.rot / ((G.diff and G.diff.spin or C.SPIN_RATE) * n.dur), 1)
                         for cx = a, a + (x2 - a) * ratio, 11 do
                             gfx.fillCircleAtPoint(cx, C.TRACKY, 6)
                         end
@@ -143,6 +143,7 @@ end
 function UI.select()
     UI.bigText("CHOOSE YOUR DANCER", 200, 6, 1.5, true)
     local d = Save.data
+    UI.text("DIFFICULTY: " .. C.DIFFS[d.diff].name .. "   (UP/DOWN)", 200, 40, "center")
     for i = 1, #SPECIES do
         local x = 34 + (i - 1) * 47
         if i > d.unlocked then

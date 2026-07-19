@@ -10,6 +10,7 @@ Save.data = nil
 function Save.load()
     local d = playdate.datastore.read("wardance") or {}
     d.unlocked = d.unlocked or 1
+    d.diff = d.diff or 2          -- difficulty index into C.DIFFS (NORMAL)
     d.best = d.best or {}
     d.ranks = d.ranks or {}
     for i = 1, STAGES do

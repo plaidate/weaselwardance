@@ -127,30 +127,7 @@ function Dancer.draw(x, y, idx, scale)
             fy + u * u * hipY + 2 * u * t * ctlY + t * t * headY
     end
 
-    -- tail (behind everything), wagging on its own beat
-    local wag = math.sin(tm * 6 + idx) * 4 * s + beat * 5 * s
-    local tipX, tipY = fx - sp.tail * s - math.abs(wag) * 0.3, fy + hipY - sp.tail * s * 0.35 - wag
-    local tcx, tcy = fx - sp.tail * s * 0.5, fy + hipY + 3 * s
-    local nT = 5
-    for i = 0, nT do
-        local t = i / nT
-        local u = 1 - t
-        local px = u * u * fx + 2 * u * t * tcx + t * t * tipX
-        local py = u * u * (fy + hipY) + 2 * u * t * tcy + t * t * tipY
-        local r = sp.tailG * s * (1 - 0.7 * t) + 1
-        if sp.style == "tailtip" and i >= nT - 1 then
-            gfx.setColor(gfx.kColorBlack)
-            gfx.fillCircleAtPoint(px, py, r + 1)
-            gfx.setColor(gfx.kColorWhite)
-            gfx.drawCircleAtPoint(px, py, r + 1)
-        else
-            bodyFill(sp.style)
-            gfx.fillCircleAtPoint(px, py, r)
-            gfx.setColor(gfx.kColorWhite)
-        end
-    end
-
-    -- hind legs
+    -- hind legs (behind the body silhouette)
     gfx.setColor(gfx.kColorWhite)
     gfx.setLineWidth(2)
     if airborne then
@@ -162,17 +139,54 @@ function Dancer.draw(x, y, idx, scale)
     end
     gfx.setLineWidth(1)
 
-    -- body circles along the spine
+    -- Silhouette: collect every body-part circle (tail, spine, ears, head,
+    -- snout), then draw the UNION — a white rim pass at r+2 and an interior
+    -- fill pass — so the animal reads as one smooth body with a single
+    -- outline, not a chain of individually outlined circles.
+    local sil = {}
+    local function part(px, py, r, fill)
+        sil[#sil + 1] = { x = px, y = py, r = r, f = fill or "body" }
+    end
+
+    -- tail, wagging on its own beat
+    local wag = math.sin(tm * 6 + idx) * 4 * s + beat * 5 * s
+    local tipX, tipY = fx - sp.tail * s - math.abs(wag) * 0.3, fy + hipY - sp.tail * s * 0.35 - wag
+    local tcx, tcy = fx - sp.tail * s * 0.5, fy + hipY + 3 * s
+    local nT = 5
+    for i = 0, nT do
+        local t = i / nT
+        local u = 1 - t
+        local px = u * u * fx + 2 * u * t * tcx + t * t * tipX
+        local py = u * u * (fy + hipY) + 2 * u * t * tcy + t * t * tipY
+        local r = sp.tailG * s * (1 - 0.7 * t) + 1
+        local tip = (sp.style == "tailtip" and i >= nT - 1)
+        part(px, py, tip and r + 1 or r, tip and "black" or "body")
+    end
+
+    -- body along the spine
     local nB = 8
     for i = 0, nB do
         local t = i / nB
         local px, py = bez(t)
-        local r = gg * (1.05 - 0.30 * t)
-        bodyFill(sp.style)
-        gfx.fillCircleAtPoint(px, py, r)
-        gfx.setColor(gfx.kColorWhite)
-        gfx.drawCircleAtPoint(px, py, r)
+        part(px, py, gg * (1.05 - 0.30 * t))
     end
+
+    -- ears, head, snout
+    local hx, hy = bez(1)
+    local hr = gg * 0.95
+    local er = sp.ear * s
+    part(hx - hr * 0.35, hy - hr * 0.9, er)
+    part(hx + hr * 0.55, hy - hr * 0.9, er)
+    part(hx, hy, hr)
+    part(hx + hr * 0.8, hy + hr * 0.18, hr * 0.45)
+
+    gfx.setColor(gfx.kColorWhite)
+    for _, p in ipairs(sil) do gfx.fillCircleAtPoint(p.x, p.y, p.r + 2) end
+    for _, p in ipairs(sil) do
+        if p.f == "black" then gfx.setColor(gfx.kColorBlack) else bodyFill(sp.style) end
+        gfx.fillCircleAtPoint(p.x, p.y, p.r)
+    end
+    gfx.setColor(gfx.kColorWhite)
 
     -- markings along the body
     if sp.style == "badger" then
@@ -205,22 +219,6 @@ function Dancer.draw(x, y, idx, scale)
     end
     gfx.setLineWidth(1)
 
-    -- head
-    local hx, hy = bez(1)
-    local hr = gg * 0.95
-    -- ears first (behind the head circle's top edge)
-    local er = sp.ear * s
-    for _, exo in ipairs({ -0.35, 0.55 }) do
-        bodyFill(sp.style)
-        gfx.fillCircleAtPoint(hx + hr * exo, hy - hr * 0.9, er)
-        gfx.setColor(gfx.kColorWhite)
-        gfx.drawCircleAtPoint(hx + hr * exo, hy - hr * 0.9, er)
-    end
-    bodyFill(sp.style)
-    gfx.fillCircleAtPoint(hx, hy, hr)
-    gfx.setColor(gfx.kColorWhite)
-    gfx.drawCircleAtPoint(hx, hy, hr)
-
     if sp.style == "badger" then
         gfx.fillEllipseInRect(hx - hr * 0.25, hy - hr, hr * 0.5, hr * 1.4)
     elseif sp.style == "mask" then
@@ -233,11 +231,7 @@ function Dancer.draw(x, y, idx, scale)
         gfx.fillCircleAtPoint(hx + hr * 0.15, hy + hr * 0.75, hr * 0.38)
     end
 
-    -- snout, nose, whiskers
-    bodyFill(sp.style)
-    gfx.fillCircleAtPoint(hx + hr * 0.8, hy + hr * 0.18, hr * 0.45)
-    gfx.setColor(gfx.kColorWhite)
-    gfx.drawCircleAtPoint(hx + hr * 0.8, hy + hr * 0.18, hr * 0.45)
+    -- nose + whiskers (the snout itself is part of the silhouette union)
     gfx.setColor(gfx.kColorBlack)
     gfx.fillCircleAtPoint(hx + hr * 1.18, hy + hr * 0.12, math.max(1.5, hr * 0.14))
     gfx.setColor(gfx.kColorWhite)

@@ -148,6 +148,14 @@ local function updateSelect(dt)
     while selCrank <= -60 do selCrank = selCrank + 60; move = move - 1 end
     if playdate.buttonJustPressed(playdate.kButtonRight) then move = move + 1 end
     if playdate.buttonJustPressed(playdate.kButtonLeft) then move = move - 1 end
+    local dd = 0
+    if playdate.buttonJustPressed(playdate.kButtonUp) then dd = 1 end
+    if playdate.buttonJustPressed(playdate.kButtonDown) then dd = -1 end
+    if dd ~= 0 then
+        Save.data.diff = Util.clamp(Save.data.diff + dd, 1, #C.DIFFS)
+        Save.store()
+        Sfx.blip(600 + Save.data.diff * 120)
+    end
     if move ~= 0 then
         G.selIx = Util.clamp(G.selIx + move, 1, #SPECIES)
         Sfx.blip(440 + G.selIx * 60)

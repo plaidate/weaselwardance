@@ -14,6 +14,7 @@ function Judge.rankFor(pct)
 end
 
 function Judge.start(notes, maxPts)
+    G.diff = C.DIFFS[(Save.data and Save.data.diff) or 3] or C.DIFFS[3]
     G.notes = notes
     G.maxPts = maxPts
     G.points = 0
@@ -62,7 +63,7 @@ local function missNote(note)
     note.hit = true
     G.nMiss = G.nMiss + 1
     G.combo = 0
-    G.meter = clamp(G.meter + C.MET_MISS, 0, 100)
+    G.meter = clamp(G.meter + C.MET_MISS * (G.diff and G.diff.meter or 1), 0, 100)
     Fx.popup("MISS", C.DANCER_X, 96)
     Dancer.stumble()
     Prey.startle()
@@ -73,7 +74,7 @@ end
 local function flub()
     G.nFlub = G.nFlub + 1
     G.combo = 0
-    G.meter = clamp(G.meter + C.MET_FLUB, 0, 100)
+    G.meter = clamp(G.meter + C.MET_FLUB * (G.diff and G.diff.meter or 1), 0, 100)
     Dancer.stumble()
     Sfx.flub()
     Harness.count("flubs")
@@ -81,18 +82,20 @@ end
 
 function Judge.press(ty)
     local sT = Conductor.t
-    local best, bdt = nil, C.GOOD + 0.001
+    local win = G.diff and G.diff.win or 1
+    local wGood, wPerfect = C.GOOD * win, C.PERFECT * win
+    local best, bdt = nil, wGood + 0.001
     for _, n in ipairs(G.notes) do
-        if n.t - sT > C.GOOD then break end
+        if n.t - sT > wGood then break end
         if not n.hit and n.type == ty then
             local d = math.abs(n.t - sT)
-            if d <= C.GOOD and d < bdt then
+            if d <= wGood and d < bdt then
                 best, bdt = n, d
             end
         end
     end
     if best then
-        land(best, bdt <= C.PERFECT and "P" or "G")
+        land(best, bdt <= wPerfect and "P" or "G")
     else
         flub()
     end
@@ -100,7 +103,7 @@ end
 
 local function judgeSpinEnd(n)
     n.hit = true
-    local ratio = n.rot / (C.SPIN_RATE * n.dur)
+    local ratio = n.rot / ((G.diff and G.diff.spin or C.SPIN_RATE) * n.dur)
     if ratio >= 1 then
         G.points = G.points + C.PTS_SPIN
         G.meter = clamp(G.meter + C.MET_SPIN, 0, 100)
@@ -160,7 +163,7 @@ function Judge.update(dt, inp)
         local n = G.notes[G.missIx]
         if n.hit then
             G.missIx = G.missIx + 1
-        elseif n.type ~= "S" and sT - n.t > C.GOOD then
+        elseif n.type ~= "S" and sT - n.t > C.GOOD * (G.diff and G.diff.win or 1) then
             missNote(n)
             G.missIx = G.missIx + 1
         elseif n.type == "S" and sT > n.t + (n.dur or 0) + 0.3 then

@@ -1,7 +1,7 @@
 name=Weasel War Dance
 author=Simon Frost
-description=A rhythm romp through the mustelid family. Hop, pounce, dook and crank the hypnotic war dance, from least weasel to giant otter.
+description=A rhythm romp through the mustelid family. Hop, pounce, dook and crank the hypnotic war dance, from least weasel to giant otter. Three difficulty settings.
 bundleID=com.sdwfrost.weaselwardance
-version=0.1
-buildNumber=2
+version=1.0
+buildNumber=3
 imagePath=launcher
